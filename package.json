@@ -19,6 +19,10 @@
   },
   "homepage": "https://github.com/JonnathanDG/TechdegreeJSProjectSeven#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "body-parser": "^1.18.3",
+    "date-fns": "^1.29.0",
+    "express": "^4.16.3",
+    "pug": "^2.0.3",
+    "twit": "^2.2.10"
   }
 }
