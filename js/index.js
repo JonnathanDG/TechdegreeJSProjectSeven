@@ -144,4 +144,5 @@ router.get('/', (req, res) => {
 	res.render('index', { user, tweets, friends, messages });
 });
 
+//Exports the router
 module.exports = router;

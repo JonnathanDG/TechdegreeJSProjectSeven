@@ -4,14 +4,16 @@ const keys = require('../config.js');
 const T = new Twit(keys.keys); //Doc at https://github.com/ttezel/twit
 let distanceInWordsToNow = require('date-fns/distance_in_words_to_now');
 
-
+//This message represent the user's DMs
 function createMessage(message){
 
     let messageObject = {};
-    messageObject.id = message.message_create.sender_id;
-    messageObject.text = message.message_create.message_data.text;
+    messageObject.id = message.message_create.sender_id; // The message that belongs to other user has a different id than the user
+    messageObject.text = message.message_create.message_data.text; // The message itself ... the text
     messageObject.date = distanceInWordsToNow(parseInt(message.created_timestamp), {addSuffix: true});
 
+    // Gets the message name and image using the message id
+    // If is different from the user means the message belongs to a friend
     T.get(`https://api.twitter.com/1.1/users/show.json?user_id=${messageObject.id}`, function (err, data, res) {
         
         messageObject.name = data.name;
@@ -22,6 +24,7 @@ function createMessage(message){
     return messageObject;
 }
 
+//Creates a user object with its data
 function createUser(userData){
 
     let user = {};
@@ -37,6 +40,7 @@ function createUser(userData){
 
 }
 
+//Create a new tweet object, this tweet is one of the user's tweets
 function createTweet(tweet){
 
     let tweetObject = {};
@@ -51,6 +55,7 @@ function createTweet(tweet){
 }
 
 //Programming can be lonely LOL
+// Because the twitter API calls followers as friends I used this name
 function createFriend(friend){
 
     let friendObject = {};
@@ -62,6 +67,8 @@ function createFriend(friend){
     return friendObject;
 }
 
+//Creates a new tweet
+// This function is used when the user post a new tweet
 function createNewTweet(reBodyStatus){
 
     // Creates a new tweet  using the  req.body.status 
@@ -69,7 +76,7 @@ function createNewTweet(reBodyStatus){
     const tweetObject = {};
     
     // The tweet is new so the only actual data that it has is the message itself
-	tweetObject.text = req.body.status;
+    tweetObject.text = reBodyStatus;
 	tweetObject.retweets = 0;
 	tweetObject.likes = 0;
     tweetObject.date = distanceInWordsToNow(new Date(), {addSuffix: true});
@@ -78,6 +85,7 @@ function createNewTweet(reBodyStatus){
 
 }
 
+//Export the functions
 module.exports.createMessage = createMessage;
 module.exports.createUser = createUser;
 module.exports.createTweet = createTweet;

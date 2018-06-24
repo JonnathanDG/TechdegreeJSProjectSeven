@@ -24,4 +24,6 @@ const keys = {
 
 module.exports.keys = keys;
 
+Write npm install to get the modules for this app 
+
 In the root directory(console command line), npm start
