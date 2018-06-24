@@ -6,20 +6,24 @@ const config = require('../config.js');
 
 //Sets as an Express app
 const app = express();
-const port = process.env.PORT || 3000; //The app will be deliver at port 3000
+const port = process.env.PORT || 3000;
 
 
 //App configuration
 app.use(bodyParser.urlencoded({ extended : false }));
 app.set("view engine", "pug"); // This app uses pug
 app.use(express.static('public')); //The static files
+
 app.use(mainRoutes); // main routes are now being used
 
 //Throw an error
+// If for some reason the main routes are not loaded
+// the error will be thrown
+// comment out app.use(mainRoutes); and the error will be loaded...
 app.use((req, res , next) => {
 
     //Sets the error message
-    const err = new Error('Not Found');
+    const err = new Error('Not Found. Looks like the server has a problem managing the data');
     
     //Sets the error status
     err.status = 404;
@@ -43,6 +47,7 @@ app.use((err, req, res, next) => {
 
 // The app can be find in http://localhost:3000
 app.listen(port, () => {
+    
 	console.log('Page loaded at localhost:3000');
 });
 

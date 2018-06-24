@@ -102,19 +102,15 @@ html(lang='en')
 				.app--section
 					ul.app--message--list
 						li
-							h3
-								| Conversations with 
-								a #{user.name}
 							ul.app--message--conversation
-								each message in messages
-									if message.id !== user.id
+								for message in messages
+									if message.name === user.name
 										li.app--message--me
 											.app--avatar(style='background-image: url('+user.picture+')')
 											p.app--message--text #{message.text}
 											p.app--message--timestamp #{message.date}
 									else
 										li.app--message
-											.app--avatar(style='background-image: url(images/m-spore.png)')
-												img(src='images/m-spore.png')
+											.app--avatar(style='background-image: url('+message.picture+')')
 											p.app--message--text #{message.text}
 											p.app--message--timestamp #{message.date}

@@ -1,22 +1,22 @@
 //Require data
 const express = require('express');
 const keys = require('../config.js');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 const Twit = require('twit');
-let distanceInWordsToNow = require('date-fns/distance_in_words_to_now');
-
+const helper = require('./helpers');
+//let distanceInWordsToNow = require('date-fns/distance_in_words_to_now');
 
 //Set the app
 const T = new Twit(keys.keys); //Doc at https://github.com/ttezel/twit
-const app = express();
-app.use(bodyParser.urlencoded({extended: false}));
+//const app = express();
+//app.use(bodyParser.urlencoded({extended: false}));
 const router = express.Router();
 
 //Data Arrays
 const tweets = [];
 const friends = [];
 const messages = [];
-const user = {};
+let user = {};
 
 //Get user Data
 T.get('account/verify_credentials',{ skip_status: true }, function(err, data, res, next){
@@ -25,19 +25,13 @@ T.get('account/verify_credentials',{ skip_status: true }, function(err, data, re
     //Is not an error
     if(!err){
 
-        user.name = data.name;
-        user.screenName = `@${data.screen_name}`;
-        user.id = data.id;
-        user.picture = data.profile_image_url;
-        user.background = data.profile_banner_url;
-        user.friendCount = data.friends_count;
+        user = helper.createUser(data);
         
     } else {
 
         //In case of error then is printed to the console
         console.error(err);
     }
-
 });
 
 //Get user last 5 tweets
@@ -50,13 +44,7 @@ T.get('statuses/user_timeline', {count: 5}, function(err, data, res){
         // and pushed to tweets array
         data.forEach(function(tweet){
 
-            let tweetObject = {};
-            tweetObject.text = tweet.text;
-            tweetObject.date = distanceInWordsToNow(tweet.created_at, {addSuffix: true});
-            tweetObject.retweets = tweet.retweet_count;
-            tweetObject.likes = tweet.favorite_count;
-
-            tweets.push(tweetObject);
+            tweets.push(helper.createTweet(tweet));
         });
 
     } else {
@@ -65,7 +53,7 @@ T.get('statuses/user_timeline', {count: 5}, function(err, data, res){
         console.error(err);
 
         //Sets the error message
-        let errorMessage = { text: "We have a problem loading your tweets" };
+        let errorMessage = { text: "We have a problem loading your tweets *It may be a connection Problem" };
 
         // Push the error to the array so can be displayed on the
         // interface
@@ -83,12 +71,7 @@ T.get('friends/list', { count: 5 }, function(err, data, res){
         // and pushed to friends array
         data.users.forEach(function(friend){
 
-            let friendObject = {};
-            friendObject.name = friend.name;
-            friendObject.screenName = `@${friend.screen_name}`;
-            friendObject.picture = friend.profile_image_url;
-
-            friends.push(friendObject);
+            friends.push(helper.createFriend(friend));
         });
 
     } else {
@@ -97,7 +80,7 @@ T.get('friends/list', { count: 5 }, function(err, data, res){
         console.error(err);
 
         //Sets the error message
-        let errorMessage = { text: "We have a problem loading your friends data" };
+        let errorMessage = { text: "We have a problem loading your friends data *It may be a connection Problem" };
 
         // Push the error to the array so can be displayed on the
         // interface
@@ -115,12 +98,7 @@ T.get('direct_messages/events/list', { count: 5 }, function(err, data, res){
         // and pushed to message array
         data.events.forEach(function(message){
 
-            let messageObject = {};
-            messageObject.id = message.message_create.sender_id;
-            messageObject.text = message.message_create.message_data.text;
-            messageObject.date = distanceInWordsToNow(parseInt(message.created_timestamp), {addSuffix: true});
-
-            messages.push(messageObject);
+            messages.push(helper.createMessage(message));
         });
 
     } else {
@@ -129,7 +107,7 @@ T.get('direct_messages/events/list', { count: 5 }, function(err, data, res){
         console.error(err);
 
         //Sets the error message
-        let errorMessage = { text: "We have a problem loading your DMs" };
+        let errorMessage = { text: "We have a problem loading your DMs *It may be a connection Problem" };
 
         // Push the error to the array so can be displayed on the
         // interface
@@ -137,18 +115,37 @@ T.get('direct_messages/events/list', { count: 5 }, function(err, data, res){
     }
 });
 
+// POST from form input
+router.post('/', (req, res) => {
+    
+    //Post to twitter
+    // https://github.com/ttezel/twit Check post method
+	T.post('statuses/update', { status: req.body.status }, (err, data, res) => {
 
+		if (err) {
+
+			console.error(err);
+        }
+    });
+
+    /////////////////////////////////////////////////////////////////////
+    //This only happens if an error is not returned
+    
+    //Remove the last element of an array
+    tweets.pop(tweets[4]);
+    
+    // Adds the new tweet as the first element of the array
+    tweets.unshift(helper.createNewTweet(req.body.status));
+    
+    //Renders the index file again
+    res.render('index', { user, tweets, friends, messages });
+    
+});
 
 // Loads the index.pug file
 router.get('/', (req, res) => {
+
 	res.render('index', { user, tweets, friends, messages });
 });
-
-
-
-
-
-
-
 
 module.exports = router;
