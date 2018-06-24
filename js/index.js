@@ -1,15 +1,11 @@
 //Require data
 const express = require('express');
 const keys = require('../config.js');
-//const bodyParser = require('body-parser');
 const Twit = require('twit');
 const helper = require('./helpers');
-//let distanceInWordsToNow = require('date-fns/distance_in_words_to_now');
 
 //Set the app
 const T = new Twit(keys.keys); //Doc at https://github.com/ttezel/twit
-//const app = express();
-//app.use(bodyParser.urlencoded({extended: false}));
 const router = express.Router();
 
 //Data Arrays
