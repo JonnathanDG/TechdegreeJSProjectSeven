@@ -2,11 +2,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mainRoutes = require('./index.js');
-const config = require('../config.js');
 
 //Sets as an Express app
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 
 //App configuration
@@ -34,14 +33,14 @@ app.use((req, res , next) => {
 
 app.use((err, req, res, next) => {
 
+    //set locals to use with template
+    res.locals.error = err;
+
     //Sets the response status
     res.status(err.status);
 
-    // Set the error object
-    err = `${err.status} : ${err.message}`;
-
     //Render the error pug template passing the error object
-    res.render('error', { err })
+    res.render('error',  err )
 
 });
 

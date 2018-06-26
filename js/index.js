@@ -21,12 +21,7 @@ T.get('account/verify_credentials',{ skip_status: true }, function(err, data, re
     //Is not an error
     if(!err){
 
-        user = helper.createUser(data);
-        
-    } else {
-
-        //In case of error then is printed to the console
-        console.error(err);
+        user = helper.createUser(data);  
     }
 });
 
@@ -42,18 +37,6 @@ T.get('statuses/user_timeline', {count: 5}, function(err, data, res){
 
             tweets.push(helper.createTweet(tweet));
         });
-
-    } else {
-
-        //Display the error in the console
-        console.error(err);
-
-        //Sets the error message
-        let errorMessage = { text: "We have a problem loading your tweets *It may be a connection Problem" };
-
-        // Push the error to the array so can be displayed on the
-        // interface
-        tweets.push(errorMessage);
     }
 });
 
@@ -70,17 +53,6 @@ T.get('friends/list', { count: 5 }, function(err, data, res){
             friends.push(helper.createFriend(friend));
         });
 
-    } else {
-
-        //Display the error in the console
-        console.error(err);
-
-        //Sets the error message
-        let errorMessage = { text: "We have a problem loading your friends data *It may be a connection Problem" };
-
-        // Push the error to the array so can be displayed on the
-        // interface
-        friends.push(errorMessage);
     }
 });
 
@@ -97,17 +69,6 @@ T.get('direct_messages/events/list', { count: 5 }, function(err, data, res){
             messages.push(helper.createMessage(message));
         });
 
-    } else {
-
-        //Display the error in the console
-        console.error(err);
-
-        //Sets the error message
-        let errorMessage = { text: "We have a problem loading your DMs *It may be a connection Problem" };
-
-        // Push the error to the array so can be displayed on the
-        // interface
-        messages.push(errorMessage);
     }
 });
 
@@ -120,22 +81,18 @@ router.post('/', (req, res) => {
 
 		if (err) {
 
-			console.error(err);
+            console.log("Check internet connection");
         }
     });
-
-    /////////////////////////////////////////////////////////////////////
-    //This only happens if an error is not returned
     
     //Remove the last element of an array
     tweets.pop(tweets[4]);
-    
+            
     // Adds the new tweet as the first element of the array
     tweets.unshift(helper.createNewTweet(req.body.status));
     
     //Renders the index file again
     res.render('index', { user, tweets, friends, messages });
-    
 });
 
 // Loads the index.pug file
