@@ -94,7 +94,7 @@ block content
 					ul.app--message--list
 						li
 							ul.app--message--conversation
-								for message in messages
+								each message in messages
 									if message.id !== user.id
 										li.app--message
 											.app--avatar(style='background-image: url('+message.picture+')')
