@@ -95,13 +95,13 @@ block content
 						li
 							ul.app--message--conversation
 								for message in messages
-									if message.id === user.id
-										li.app--message--me
-											.app--avatar(style='background-image: url('+user.picture+')')
+									if message.id !== user.id
+										li.app--message
+											.app--avatar(style='background-image: url('+message.picture+')')
 											p.app--message--text #{message.text}
 											p.app--message--timestamp #{message.date}
 									else
-										li.app--message
-											.app--avatar(style='background-image: url('+message.picture+')')
+										li.app--message--me
+											.app--avatar(style='background-image: url('+user.picture+')')
 											p.app--message--text #{message.text}
 											p.app--message--timestamp #{message.date}
